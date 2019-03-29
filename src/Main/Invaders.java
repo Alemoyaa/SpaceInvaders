@@ -17,13 +17,16 @@ import javax.swing.JFrame;
 import javax.swing.JPanel;
 
 public class Invaders extends Canvas {
-	public static final int WIDTH = 800;
-	public static final int HEIGHT = 600;
+	public static final int WIDTH = 640;
+	public static final int HEIGHT = 480;
 	
 	public HashMap sprites;
+	public int posX,posY;
 	
 	public Invaders() {
 		sprites = new HashMap();
+		posX = WIDTH/2;
+		posY = HEIGHT/2;
 		
 		JFrame ventana = new JFrame("Invaders");
 		JPanel panel = (JPanel)ventana.getContentPane();
@@ -34,10 +37,12 @@ public class Invaders extends Canvas {
 		ventana.setBounds(0,0,WIDTH,HEIGHT);
 		ventana.setVisible(true);
 		ventana.addWindowListener( new WindowAdapter() {
+                        @Override
 			public void windowClosing(WindowEvent e) {
 				System.exit(0);
 			}
 		});
+		ventana.setResizable(false);
 	}
 	
 	public BufferedImage loadImage(String nombre) {
@@ -63,11 +68,26 @@ public class Invaders extends Canvas {
 	}
 	
 	
+        @Override
 	public void paint(Graphics g) {
-		g.drawImage(getSprite("bicho.gif"), 40, 40,this);
+		g.drawImage(getSprite("bicho.gif"), posX, posY,this);
+	}
+	
+	public void updateWorld() {
+		posX = (int)(Math.random()*WIDTH);
+		posY = (int)(Math.random()*HEIGHT);
+	}
+	
+	public void game() {
+		while (isVisible()) {
+			updateWorld();
+			paint(getGraphics());
+		}
 	}
 	
 	public static void main(String[] args) {
 		Invaders inv = new Invaders();
+		inv.game();
 	}
 }
+
