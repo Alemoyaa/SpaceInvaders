@@ -16,18 +16,29 @@ import javax.imageio.ImageIO;
 import javax.swing.JFrame;
 import javax.swing.JPanel;
 
+/*
+
+Si la variable que representa la velocidad es positiva, (vX > 0), entonces la posición X irá aumentando y 
+por lo tanto el bicho se moverá a la derecha. Si la variable vX es negativa, la posición X irá disminuyendo y 
+el bicho se moverá a la izquierda.
+*/
+
 public class Invaders extends Canvas {
 	public static final int WIDTH = 640;
 	public static final int HEIGHT = 480;
+	public static final int SPEED = 10;
 	
 	public HashMap sprites;
-	public int posX,posY;
+	public int posX,posY,vX;//Controlamos la velocidad a la que se mueve por la horizontal;
+	public BufferedImage buffer;
 	
 	public Invaders() {
 		sprites = new HashMap();
 		posX = WIDTH/2;
 		posY = HEIGHT/2;
-		
+		vX = 2;
+		buffer = new BufferedImage(WIDTH,HEIGHT, BufferedImage.TYPE_INT_RGB);
+	
 		JFrame ventana = new JFrame("Invaders");
 		JPanel panel = (JPanel)ventana.getContentPane();
 		setBounds(0,0,WIDTH,HEIGHT);
@@ -37,11 +48,11 @@ public class Invaders extends Canvas {
 		ventana.setBounds(0,0,WIDTH,HEIGHT);
 		ventana.setVisible(true);
 		ventana.addWindowListener( new WindowAdapter() {
-                        @Override
 			public void windowClosing(WindowEvent e) {
 				System.exit(0);
 			}
 		});
+		ventana.setIgnoreRepaint(true);
 		ventana.setResizable(false);
 	}
 	
@@ -67,21 +78,32 @@ public class Invaders extends Canvas {
 		return img;
 	}
 	
-	
-        @Override
-	public void paint(Graphics g) {
+	public void paintWorld() {
+		Graphics g = buffer.getGraphics();
+		g.setColor(getBackground());
+		g.fillRect(0,0,getWidth(),getHeight());
 		g.drawImage(getSprite("bicho.gif"), posX, posY,this);
+		getGraphics().drawImage(buffer,0,0,this);
 	}
 	
+
+	public void paint(Graphics g) {}
+	public void update(Graphics g) {}
+		
+	
 	public void updateWorld() {
-		posX = (int)(Math.random()*WIDTH);
-		posY = (int)(Math.random()*HEIGHT);
+		posX += vX;
+		if (posX < 0 || posX > WIDTH) vX = -vX;
 	}
 	
 	public void game() {
 		while (isVisible()) {
 			updateWorld();
+			paintWorld();
 			paint(getGraphics());
+			try { 
+				 Thread.sleep(SPEED);
+			} catch (InterruptedException e) {}
 		}
 	}
 	
