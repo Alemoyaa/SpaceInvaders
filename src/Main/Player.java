@@ -8,6 +8,9 @@ package Main;
 import java.awt.event.KeyEvent;
 
 public class Player extends Actor{
+    
+    public static final int MAX_SHIELDS = 200;
+    public static final int MAX_BOMBS = 5;
     protected static final int PLAYER_SPEED=4;  
     protected int vx;
     protected int vy;
@@ -15,22 +18,35 @@ public class Player extends Actor{
     
     private int clusterBombs;
     
+    private int score;
+    private int shields;
+    
     public Player (Stage stage){
         super(stage);
         setSpriteNames ( new String[] {"nave.gif"});
         
-        clusterBombs = 5;
+        clusterBombs = MAX_BOMBS;
+        
+        shields = MAX_SHIELDS;
+        
+        score = 0;
     }
     
     public void act(){
-        super.act();
+        super.act(); //Limites del actor
         x += vx;
         y += vy;
-        if(x < 0 || x > Stage.WIDTH){
-            vx = -vx;
+        if (x < 0) {
+            x = 0;
         }
-        if(y < 0 || y > Stage.HEIGHT){
-            vy = -vy;
+        if (x > Stage.WIDTH - getWidth()){
+            x = Stage.WIDTH - getWidth();
+        }
+        if (y < 0) {
+            y = 0;
+        }
+        if (y > Stage.PLAY_HEIGHT - getHeight()) {
+            y = Stage.PLAY_HEIGHT - getHeight();
         }
     }
     
@@ -101,5 +117,38 @@ public class Player extends Actor{
         stage.addActor( new Bomb(stage, Bomb.DOWN_LEFT,x,y));
         stage.addActor( new Bomb(stage, Bomb.DOWN,x,y));
         stage.addActor( new Bomb(stage, Bomb.DOWN_RIGHT,x,y));
+    }
+    
+    public int getScore() {return score;}
+    public void setScore(int i) {score = i;}
+    public void addScore(int i) { score += i;}
+    
+    public int getShields() {return shields;}
+    public void setShields(int i) { shields = i; }
+    public void addShields(int i){
+        shields += i;
+        if(shields > MAX_SHIELDS){
+            shields = MAX_SHIELDS;
+        }
+    }
+    
+    public int getClusterBombs(){ return clusterBombs; }
+    public void setClusterBombs(int i) { clusterBombs = i;}
+    
+    public void collision(Actor a){
+        if (a instanceof Monster ){
+        a.remove();
+        addScore(40);
+        addShields(-40);
+        if(getShields() < 0)
+            stage.gameOver();
+        }
+        if (a instanceof Laser) {
+        a.remove();
+        addShields(-10);
+        }
+        if(getShields() < 0){
+            stage.gameOver();
+        }
     }
 }
