@@ -1,39 +1,23 @@
-
 package Main;
 
 import java.awt.image.BufferedImage;
 import java.net.URL;
-import java.util.HashMap;
-
 import javax.imageio.ImageIO;
 
-public class SpriteCache {
-    
-        private HashMap sprites;
-        
-        public SpriteCache(){
-        sprites = new HashMap();
-        }
-        
-        public BufferedImage loadImage(String nombre) {
-		URL url=null;
+public class SpriteCache extends ResourceCache{
+	
+	protected Object loadResource(URL url) {
 		try {
-			url = getClass().getClassLoader().getResource(nombre);
 			return ImageIO.read(url);
 		} catch (Exception e) {
-			System.out.println("No se pudo cargar la imagen " + nombre +" de "+url);
+			System.out.println("No se pudo cargar la imagen de "+url);
 			System.out.println("El error fue : "+e.getClass().getName()+" "+e.getMessage());
 			System.exit(0);
 			return null;
 		}
 	}
-        public BufferedImage getSprite(String nombre) {
-		BufferedImage img = (BufferedImage)sprites.get(nombre);
-		if (img == null) {
-			img = loadImage("res/"+nombre);
-			sprites.put(nombre,img);
-		}
-		return img;
+	
+	public BufferedImage getSprite(String name) {
+		return (BufferedImage)getResource(name);
 	}
 }
-  
