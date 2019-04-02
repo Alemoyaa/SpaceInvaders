@@ -18,29 +18,25 @@ import java.util.ArrayList;
 
 import javax.swing.JFrame;
 import javax.swing.JPanel;
-/*
-Miramos el bucle principal y examinamos el tiempo que tarda en ralizarse un turno
-Supongamos que obtenemos una cierta cantidad de milisegundos. 
-Ahora dividimos 1000 (1 segundo) por la cantidad calculada y obtenemos los fps
-*/
+
 public class Invaders extends Canvas implements Stage, KeyListener {
 	
 	private BufferStrategy strategy;
 	private long usedTime;
 	
 	private SpriteCache spriteCache;
+	private SoundCache soundCache;
 	private ArrayList actors; 
 	private Player player;
+	private BufferedImage ocean;
+	private int t;
 	
-        private BufferedImage ocean;
-        private int t;
-        
 	private boolean gameEnded=false;
 	
 	public Invaders() {
 		spriteCache = new SpriteCache();
+		soundCache = new SoundCache();
 		
-	
 		JFrame ventana = new JFrame("Invaders");
 		JPanel panel = (JPanel)ventana.getContentPane();
 		setBounds(0,0,Stage.WIDTH,Stage.HEIGHT);
@@ -79,6 +75,8 @@ public class Invaders extends Canvas implements Stage, KeyListener {
     player = new Player(this);
     player.setX(Stage.WIDTH/2);
     player.setY(Stage.PLAY_HEIGHT - 2*player.getHeight());
+    
+    soundCache.loopSound("musica.wav");
 	}
 	
 	public void addActor(Actor a) {
@@ -155,8 +153,8 @@ public class Invaders extends Canvas implements Stage, KeyListener {
 		g.setColor(Color.white);
 		if (usedTime > 0)
 		  g.drawString(String.valueOf(1000/usedTime)+" fps",Stage.WIDTH-50,Stage.PLAY_HEIGHT);
-	else
-		g.drawString("--- fps",Stage.WIDTH-50,Stage.PLAY_HEIGHT);
+  	else
+	  	g.drawString("--- fps",Stage.WIDTH-50,Stage.PLAY_HEIGHT);
 	}
 	
 	
@@ -169,9 +167,9 @@ public class Invaders extends Canvas implements Stage, KeyListener {
 	
 	public void paintWorld() {
 		Graphics2D g = (Graphics2D)strategy.getDrawGraphics();
-                ocean = spriteCache.getSprite("oceano.gif");
-                g.setPaint(new TexturePaint(ocean, new Rectangle(0,t,ocean.getWidth(),ocean.getHeight())));
-                g.fillRect(0,0,getWidth(),getHeight());
+		ocean = spriteCache.getSprite("oceano.gif");
+		g.setPaint(new TexturePaint(ocean, new Rectangle(0,t,ocean.getWidth(),ocean.getHeight())));
+		g.fillRect(0,0,getWidth(),getHeight());
 		for (int i = 0; i < actors.size(); i++) {
 			Actor m = (Actor)actors.get(i);
 			m.paint(g);
@@ -195,6 +193,10 @@ public class Invaders extends Canvas implements Stage, KeyListener {
 		return spriteCache;
 	}
 	
+	public SoundCache getSoundCache() {
+		return soundCache;
+	}
+	
 	public void keyPressed(KeyEvent e) {
 		player.keyPressed(e);
 	}
@@ -206,11 +208,11 @@ public class Invaders extends Canvas implements Stage, KeyListener {
 	
 	public void game() {
 		usedTime=1000;
-                t=0;
+		t = 0;
 		initWorld();
 		while (isVisible() && !gameEnded) {
 			t++;
-                        long startTime = System.currentTimeMillis();
+			long startTime = System.currentTimeMillis();
 			updateWorld();
 			checkCollisions();
 			paintWorld();
