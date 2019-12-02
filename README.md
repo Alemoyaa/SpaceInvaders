@@ -1,1 +1,0 @@
-Juego desarrollado por estudiante de la UTN Mendoza
