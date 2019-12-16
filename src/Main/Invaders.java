@@ -1,6 +1,7 @@
 package Main;
 
 
+import static Main.Stage.SPEED;
 import java.awt.Canvas;
 import java.awt.Color;
 import java.awt.Dimension;
@@ -17,6 +18,7 @@ import java.awt.image.BufferedImage;
 import java.util.ArrayList;
 
 import javax.swing.JFrame;
+import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 
 public class Invaders extends Canvas implements Stage, KeyListener {
@@ -159,10 +161,14 @@ public class Invaders extends Canvas implements Stage, KeyListener {
 	
 	
 	public void paintStatus(Graphics2D g) {
-	  paintScore(g);
-	  paintShields(g);
-	  paintAmmo(g);
-	  paintfps(g);	
+            try{
+                paintScore(g);
+                paintShields(g);
+                paintAmmo(g);
+                paintfps(g);	
+            }catch(Exception e){
+                JOptionPane.showMessageDialog(null, "Hubo un error en el dibujado de interfaz \nVuelva a iniciar el juego mas tarde.");
+            }	
 	}
 	
 	public void paintWorld() {
@@ -218,14 +224,32 @@ public class Invaders extends Canvas implements Stage, KeyListener {
 			paintWorld();
 			usedTime = System.currentTimeMillis()-startTime;
 			try { 
-				 Thread.sleep(SPEED);
-			} catch (InterruptedException e) {}
+                            Thread.sleep(SPEED);
+			} catch (InterruptedException e) {
+                            JOptionPane.showMessageDialog(null, "Excepcion: "+e.getMessage());
+                        }
 		}
 		paintGameOver();
 	}
 	
 	public static void main(String[] args) {
-		Invaders inv = new Invaders();
+		try{
+                Invaders inv = new Invaders();
 		inv.game();
+                }catch(Exception e){
+                    JOptionPane.showMessageDialog(null, "Demasiado aliens en pantalla se reiniciara el juego: "); 
+                    Invaders inv = new Invaders();
+		try{
+                    inv.game();
+                    if(inv.usedTime < 1){
+                    JOptionPane.showMessageDialog(null, "Su ordenador bajo de los 5 fps, por esta razón el juego se cerrara.");
+                    System.exit(ABORT);
+                }
+                }catch(Exception ex2){
+                    JOptionPane.showMessageDialog(null, "Su ordenador no soporta tal cantidad de aliens en pantalla."); 
+                    JOptionPane.showMessageDialog(null, "Saliendo del videojuego..."); 
+                    System.exit(ERROR);
+                }
+            }
 	}
 }
